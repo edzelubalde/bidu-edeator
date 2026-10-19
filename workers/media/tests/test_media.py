@@ -166,3 +166,32 @@ def test_overlay_and_mixed_sources(sources, tmp_path):
     assert codes[30:60] == list(range(240, 270))
     check = verify_output(out, t, PREVIEW)
     assert check.ok, check.errors
+
+
+def test_timeline_starting_with_a_silent_clip_keeps_full_length(sources, tmp_path):
+    # Regression: audio that starts mid-timeline used to shorten the mix, and the
+    # final mux cut the picture down to the audio's length.
+    t = empty_timeline("p", "e1")
+    t = primary_shot(
+        t,
+        clip_id="s1",
+        asset_id="silent",
+        beat_id="b1",
+        source_in_seconds=Fraction(0),
+        duration_seconds=Fraction(2),
+        with_audio=False,
+    )
+    t = primary_shot(
+        t,
+        clip_id="s2",
+        asset_id="land",
+        beat_id="b2",
+        source_in_seconds=Fraction(1),
+        duration_seconds=Fraction(1),
+    )
+    out = tmp_path / "late_audio.mp4"
+    render(t, sources, out, profile=PREVIEW, cache_dir=tmp_path / "cache")
+    check = verify_output(out, t, PREVIEW)
+    assert check.ok, check.errors
+    assert check.frames == 90
+    assert check.duration_seconds == pytest.approx(3, abs=0.05)

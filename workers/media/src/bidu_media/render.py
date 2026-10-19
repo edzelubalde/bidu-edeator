@@ -249,7 +249,9 @@ def audio_args(
         if clip.fade_out_frames:
             fo = rate.frames_to_seconds(clip.fade_out_frames)
             chain.append(f"afade=t=out:st={_secs(dur - fo)}:d={_secs(fo)}")
-        chain.append(f"adelay={delay_ms}:all=1")
+        # adelay keeps the original timestamps, so later trims would drop the inserted
+        # silence; renumber samples from zero so the clip lands at its timeline position.
+        chain += [f"adelay={delay_ms}:all=1", "asetpts=N/SR/TB"]
         label = f"a{n}"
         graph.append(",".join(chain) + f"[{label}]")
         (speech if track == "A1" and clip.role == "dialogue" else beds).append(label)
