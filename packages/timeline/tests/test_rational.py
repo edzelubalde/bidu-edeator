@@ -13,7 +13,9 @@ def test_ntsc_rate_round_trips_without_drift():
     assert ntsc.fps == Fraction(30000, 1001)
 
 
-@pytest.mark.parametrize("text,expected", [("30", Fraction(30)), ("60000/1001", Fraction(60000, 1001)), ("25/1", Fraction(25))])
+@pytest.mark.parametrize(
+    "text,expected", [("30", Fraction(30)), ("60000/1001", Fraction(60000, 1001)), ("25/1", Fraction(25))]
+)
 def test_parse(text, expected):
     assert Rate.parse(text).fps == expected
 

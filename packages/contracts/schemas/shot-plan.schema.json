@@ -1,0 +1,93 @@
+{
+  "$defs": {
+    "Shot": {
+      "properties": {
+        "asset_id": {
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "beat_id": {
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "in_ms": {
+          "title": "In Ms",
+          "type": "integer"
+        },
+        "locked": {
+          "default": false,
+          "title": "Locked",
+          "type": "boolean"
+        },
+        "moment_id": {
+          "title": "Moment Id",
+          "type": "string"
+        },
+        "out_ms": {
+          "title": "Out Ms",
+          "type": "integer"
+        },
+        "overlay_offset_ms": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Overlay Offset Ms"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "beat_id",
+        "moment_id",
+        "asset_id",
+        "in_ms",
+        "out_ms",
+        "reason"
+      ],
+      "title": "Shot",
+      "type": "object"
+    }
+  },
+  "$id": "https://bidu.dev/schemas/shot-plan.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "conflicts": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Conflicts",
+      "type": "array"
+    },
+    "proposal_id": {
+      "title": "Proposal Id",
+      "type": "string"
+    },
+    "shots": {
+      "items": {
+        "$ref": "#/$defs/Shot"
+      },
+      "title": "Shots",
+      "type": "array"
+    },
+    "total_ms": {
+      "title": "Total Ms",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "proposal_id",
+    "shots",
+    "total_ms"
+  ],
+  "title": "ShotPlan",
+  "type": "object"
+}

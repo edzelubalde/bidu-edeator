@@ -106,8 +106,13 @@ def _rotation(stream: dict) -> int:
 def _detect_vfr(path: Path, index: int, nominal: Rate) -> bool:
     """Look at real packet spacing in the first 20 s rather than trusting header rates."""
     data = ffprobe_json(
-        path, "-select_streams", str(index), "-read_intervals", "%+20",
-        "-show_entries", "packet=pts_time,flags",
+        path,
+        "-select_streams",
+        str(index),
+        "-read_intervals",
+        "%+20",
+        "-show_entries",
+        "packet=pts_time,flags",
     )
     times = sorted(
         Fraction(p["pts_time"]) for p in data.get("packets", []) if p.get("pts_time") not in (None, "N/A")

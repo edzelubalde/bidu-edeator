@@ -89,10 +89,24 @@ def sources(fixtures):
 
 def _two_shots():
     t = empty_timeline("p", "e1")
-    t = primary_shot(t, clip_id="s1", asset_id="land", beat_id="b1",
-                     source_in_seconds=Fraction(2), duration_seconds=Fraction(1), audio_fade_frames=3)
-    t = primary_shot(t, clip_id="s2", asset_id="land", beat_id="b2",
-                     source_in_seconds=Fraction(8), duration_seconds=Fraction(1), audio_fade_frames=3)
+    t = primary_shot(
+        t,
+        clip_id="s1",
+        asset_id="land",
+        beat_id="b1",
+        source_in_seconds=Fraction(2),
+        duration_seconds=Fraction(1),
+        audio_fade_frames=3,
+    )
+    t = primary_shot(
+        t,
+        clip_id="s2",
+        asset_id="land",
+        beat_id="b2",
+        source_in_seconds=Fraction(8),
+        duration_seconds=Fraction(1),
+        audio_fade_frames=3,
+    )
     return t
 
 
@@ -116,12 +130,32 @@ def test_render_is_frame_accurate_and_reuses_segments(sources, tmp_path):
 def test_overlay_and_mixed_sources(sources, tmp_path):
     t = _two_shots()
     # HDR overlay for the last half of the first shot; dialogue from s1 keeps playing.
-    t = overlay_shot(t, clip_id="o1", asset_id="hdr", beat_id="b1", timeline_start_frame=15,
-                     source_in_seconds=Fraction(1), duration_seconds=Fraction(1, 2))
-    t = primary_shot(t, clip_id="s3", asset_id="portrait", beat_id="b3",
-                     source_in_seconds=Fraction(0), duration_seconds=Fraction(1))
-    t = primary_shot(t, clip_id="s4", asset_id="silent", beat_id="b3",
-                     source_in_seconds=Fraction(1), duration_seconds=Fraction(1), with_audio=False)
+    t = overlay_shot(
+        t,
+        clip_id="o1",
+        asset_id="hdr",
+        beat_id="b1",
+        timeline_start_frame=15,
+        source_in_seconds=Fraction(1),
+        duration_seconds=Fraction(1, 2),
+    )
+    t = primary_shot(
+        t,
+        clip_id="s3",
+        asset_id="portrait",
+        beat_id="b3",
+        source_in_seconds=Fraction(0),
+        duration_seconds=Fraction(1),
+    )
+    t = primary_shot(
+        t,
+        clip_id="s4",
+        asset_id="silent",
+        beat_id="b3",
+        source_in_seconds=Fraction(1),
+        duration_seconds=Fraction(1),
+        with_audio=False,
+    )
     out = tmp_path / "mixed.mp4"
     render(t, sources, out, profile=PREVIEW, cache_dir=tmp_path / "cache")
     codes = read_frame_codes(out)

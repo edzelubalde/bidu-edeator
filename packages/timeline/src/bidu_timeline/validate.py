@@ -79,9 +79,7 @@ def validate_timeline(timeline: Timeline, sources: Mapping[str, SourceInfo]) -> 
             err("DUPLICATE_CLIP_ID", f"Clip id {clip.id} is used twice", clip.id)
         seen.add(clip.id)
 
-    video_by_id: dict[str, VideoClip] = {
-        c.id: c for c in timeline.video("V1") + timeline.video("V2")
-    }
+    video_by_id: dict[str, VideoClip] = {c.id: c for c in timeline.video("V1") + timeline.video("V2")}
 
     for clip in timeline.all_clips():
         cid = clip.id
@@ -179,8 +177,7 @@ def _check_link(clip: AudioClip, video_by_id: dict[str, VideoClip], rate, err) -
     if abs(source_offset - timeline_offset) > rate.frame_seconds:
         err(
             "LINK_OUT_OF_SYNC",
-            f"Audio is {float(source_offset - timeline_offset):+.3f}s out of sync with "
-            f"{video.id}",
+            f"Audio is {float(source_offset - timeline_offset):+.3f}s out of sync with {video.id}",
             clip.id,
         )
 

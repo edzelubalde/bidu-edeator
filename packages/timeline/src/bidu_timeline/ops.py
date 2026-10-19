@@ -213,9 +213,7 @@ class _State:
     def set_lock(self, clip_id: str, source: bool | None, position: bool | None) -> None:
         track, i = self._find_video(clip_id)
         locks = track[i].locks.model_copy(
-            update={
-                k: v for k, v in {"source": source, "position": position}.items() if v is not None
-            }
+            update={k: v for k, v in {"source": source, "position": position}.items() if v is not None}
         )
         track[i] = track[i].model_copy(update={"locks": locks})
 

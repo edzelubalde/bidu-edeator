@@ -1,0 +1,467 @@
+{
+  "$defs": {
+    "AudioClip": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "beat_id": {
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "duration_frames": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Frames",
+          "type": "integer"
+        },
+        "fade_in_frames": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Fade In Frames",
+          "type": "integer"
+        },
+        "fade_out_frames": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Fade Out Frames",
+          "type": "integer"
+        },
+        "gain_db": {
+          "default": 0.0,
+          "maximum": 12.0,
+          "minimum": -60.0,
+          "title": "Gain Db",
+          "type": "number"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "linked_video_clip_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Linked Video Clip Id"
+        },
+        "loop": {
+          "default": false,
+          "title": "Loop",
+          "type": "boolean"
+        },
+        "role": {
+          "default": "dialogue",
+          "enum": [
+            "dialogue",
+            "ambience",
+            "music"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "source_duration": {
+          "$ref": "#/$defs/RationalTime"
+        },
+        "source_in": {
+          "$ref": "#/$defs/RationalTime"
+        },
+        "timeline_start_frame": {
+          "minimum": 0,
+          "title": "Timeline Start Frame",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "asset_id",
+        "beat_id",
+        "timeline_start_frame",
+        "duration_frames",
+        "source_in",
+        "source_duration"
+      ],
+      "title": "AudioClip",
+      "type": "object"
+    },
+    "AudioTrack": {
+      "additionalProperties": false,
+      "properties": {
+        "clips": {
+          "items": {
+            "$ref": "#/$defs/AudioClip"
+          },
+          "title": "Clips",
+          "type": "array"
+        },
+        "id": {
+          "enum": [
+            "A1",
+            "A2"
+          ],
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "audio",
+          "default": "audio",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "AudioTrack",
+      "type": "object"
+    },
+    "Canvas": {
+      "additionalProperties": false,
+      "properties": {
+        "height": {
+          "exclusiveMinimum": 0,
+          "title": "Height",
+          "type": "integer"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "title": "Width",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "width",
+        "height"
+      ],
+      "title": "Canvas",
+      "type": "object"
+    },
+    "Caption": {
+      "additionalProperties": false,
+      "properties": {
+        "end_frame": {
+          "exclusiveMinimum": 0,
+          "title": "End Frame",
+          "type": "integer"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "start_frame": {
+          "minimum": 0,
+          "title": "Start Frame",
+          "type": "integer"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "start_frame",
+        "end_frame",
+        "text"
+      ],
+      "title": "Caption",
+      "type": "object"
+    },
+    "Locks": {
+      "additionalProperties": false,
+      "properties": {
+        "position": {
+          "default": false,
+          "title": "Position",
+          "type": "boolean"
+        },
+        "source": {
+          "default": false,
+          "title": "Source",
+          "type": "boolean"
+        }
+      },
+      "title": "Locks",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "planner_run_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Planner Run Id"
+        },
+        "proposal_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Proposal Id"
+        }
+      },
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Rate": {
+      "description": "A frame rate as an exact ratio, e.g. 30000/1001 for 29.97.",
+      "properties": {
+        "denominator": {
+          "default": 1,
+          "exclusiveMinimum": 0,
+          "title": "Denominator",
+          "type": "integer"
+        },
+        "numerator": {
+          "exclusiveMinimum": 0,
+          "title": "Numerator",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "numerator"
+      ],
+      "title": "Rate",
+      "type": "object"
+    },
+    "RationalTime": {
+      "description": "``value`` frames at ``rate_num/rate_den`` frames per second.",
+      "properties": {
+        "rate_den": {
+          "default": 1,
+          "exclusiveMinimum": 0,
+          "title": "Rate Den",
+          "type": "integer"
+        },
+        "rate_num": {
+          "exclusiveMinimum": 0,
+          "title": "Rate Num",
+          "type": "integer"
+        },
+        "value": {
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value",
+        "rate_num"
+      ],
+      "title": "RationalTime",
+      "type": "object"
+    },
+    "VideoClip": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "beat_id": {
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "duration_frames": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Frames",
+          "type": "integer"
+        },
+        "fit": {
+          "default": "contain",
+          "enum": [
+            "contain",
+            "cover"
+          ],
+          "title": "Fit",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "locks": {
+          "$ref": "#/$defs/Locks"
+        },
+        "moment_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Moment Id"
+        },
+        "opacity": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Opacity",
+          "type": "number"
+        },
+        "source_duration": {
+          "$ref": "#/$defs/RationalTime"
+        },
+        "source_in": {
+          "$ref": "#/$defs/RationalTime"
+        },
+        "speed": {
+          "const": 1,
+          "default": 1,
+          "title": "Speed",
+          "type": "integer"
+        },
+        "timeline_start_frame": {
+          "minimum": 0,
+          "title": "Timeline Start Frame",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "asset_id",
+        "beat_id",
+        "timeline_start_frame",
+        "duration_frames",
+        "source_in",
+        "source_duration"
+      ],
+      "title": "VideoClip",
+      "type": "object"
+    },
+    "VideoTrack": {
+      "additionalProperties": false,
+      "properties": {
+        "clips": {
+          "items": {
+            "$ref": "#/$defs/VideoClip"
+          },
+          "title": "Clips",
+          "type": "array"
+        },
+        "id": {
+          "enum": [
+            "V1",
+            "V2"
+          ],
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "video",
+          "default": "video",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "VideoTrack",
+      "type": "object"
+    }
+  },
+  "$id": "https://bidu.dev/schemas/timeline.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "canvas": {
+      "$ref": "#/$defs/Canvas"
+    },
+    "captions": {
+      "items": {
+        "$ref": "#/$defs/Caption"
+      },
+      "title": "Captions",
+      "type": "array"
+    },
+    "duration_frames": {
+      "minimum": 0,
+      "title": "Duration Frames",
+      "type": "integer"
+    },
+    "edit_version_id": {
+      "title": "Edit Version Id",
+      "type": "string"
+    },
+    "project_id": {
+      "title": "Project Id",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "timebase": {
+      "$ref": "#/$defs/Rate"
+    },
+    "tracks": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "audio": "#/$defs/AudioTrack",
+            "video": "#/$defs/VideoTrack"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/VideoTrack"
+          },
+          {
+            "$ref": "#/$defs/AudioTrack"
+          }
+        ]
+      },
+      "title": "Tracks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "project_id",
+    "edit_version_id",
+    "timebase",
+    "canvas",
+    "duration_frames",
+    "tracks"
+  ],
+  "title": "Timeline",
+  "type": "object"
+}

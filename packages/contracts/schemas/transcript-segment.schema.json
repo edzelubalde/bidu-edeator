@@ -1,0 +1,102 @@
+{
+  "$defs": {
+    "Word": {
+      "properties": {
+        "end_ms": {
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "probability": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Probability"
+        },
+        "start_ms": {
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start_ms",
+        "end_ms",
+        "text"
+      ],
+      "title": "Word",
+      "type": "object"
+    }
+  },
+  "$id": "https://bidu.dev/schemas/transcript-segment.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "analysis_run_id": {
+      "title": "Analysis Run Id",
+      "type": "string"
+    },
+    "asset_id": {
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "end_ms": {
+      "title": "End Ms",
+      "type": "integer"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "language": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Language"
+    },
+    "start_ms": {
+      "title": "Start Ms",
+      "type": "integer"
+    },
+    "text": {
+      "title": "Text",
+      "type": "string"
+    },
+    "uncertain": {
+      "default": false,
+      "title": "Uncertain",
+      "type": "boolean"
+    },
+    "words": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Word"
+      },
+      "title": "Words",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "asset_id",
+    "analysis_run_id",
+    "start_ms",
+    "end_ms",
+    "text"
+  ],
+  "title": "TranscriptSegment",
+  "type": "object"
+}

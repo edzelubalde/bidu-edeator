@@ -68,10 +68,7 @@ def sdr_filter(probe: Probe) -> str:
 
 def fit_filter(width: int, height: int, fit: str = "contain", pad_color: str = "0x111111") -> str:
     if fit == "cover":
-        return (
-            f"scale={width}:{height}:force_original_aspect_ratio=increase,"
-            f"crop={width}:{height},setsar=1"
-        )
+        return f"scale={width}:{height}:force_original_aspect_ratio=increase,crop={width}:{height},setsar=1"
     return (
         f"scale={width}:{height}:force_original_aspect_ratio=decrease,"
         f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:color={pad_color},setsar=1"
@@ -95,10 +92,34 @@ def normalize(source: Path, probe: Probe, out_dir: Path, *, thumb_every: int = 2
     proxy = out_dir / "proxy.mp4"
     w, h = proxy_size(probe)
     vf = f"{sdr_filter(probe)},scale={w}:{h},fps={PROXY_RATE.numerator}/{PROXY_RATE.denominator}"
-    args = ["-i", str(source), "-map", "0:v:0", "-vf", vf,
-            "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p",
-            "-g", "30", "-keyint_min", "30", "-sc_threshold", "0",
-            "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709"]
+    args = [
+        "-i",
+        str(source),
+        "-map",
+        "0:v:0",
+        "-vf",
+        vf,
+        "-c:v",
+        "libx264",
+        "-preset",
+        "veryfast",
+        "-crf",
+        "23",
+        "-pix_fmt",
+        "yuv420p",
+        "-g",
+        "30",
+        "-keyint_min",
+        "30",
+        "-sc_threshold",
+        "0",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "-colorspace",
+        "bt709",
+    ]
     if probe.audio:
         args += ["-map", "0:a:0", "-c:a", "aac", "-b:a", "128k", "-ac", "2", "-ar", "48000"]
     args += ["-movflags", "+faststart", "-metadata:s:v:0", "rotate=0", str(proxy)]
@@ -108,17 +129,49 @@ def normalize(source: Path, probe: Probe, out_dir: Path, *, thumb_every: int = 2
     waveform = None
     if probe.audio:
         analysis_audio = out_dir / "audio_16k.wav"
-        _atomic(analysis_audio, ["-i", str(source), "-map", "0:a:0", "-ac", "1", "-ar", "16000",
-                                 "-c:a", "pcm_s16le", str(analysis_audio)])
+        _atomic(
+            analysis_audio,
+            [
+                "-i",
+                str(source),
+                "-map",
+                "0:a:0",
+                "-ac",
+                "1",
+                "-ar",
+                "16000",
+                "-c:a",
+                "pcm_s16le",
+                str(analysis_audio),
+            ],
+        )
         waveform = out_dir / "waveform.png"
-        _atomic(waveform, ["-i", str(analysis_audio), "-filter_complex",
-                           "showwavespic=s=1200x120:colors=0x7aa2f7", "-frames:v", "1",
-                           str(waveform)])
+        _atomic(
+            waveform,
+            [
+                "-i",
+                str(analysis_audio),
+                "-filter_complex",
+                "showwavespic=s=1200x120:colors=0x7aa2f7",
+                "-frames:v",
+                "1",
+                str(waveform),
+            ],
+        )
 
     thumbs_dir = out_dir / "thumbs"
     thumbs_dir.mkdir(exist_ok=True)
-    run_ffmpeg(["-i", str(proxy), "-vf", f"fps=1/{thumb_every},scale=320:-2", "-q:v", "4",
-                str(thumbs_dir / "t%05d.jpg")])
+    run_ffmpeg(
+        [
+            "-i",
+            str(proxy),
+            "-vf",
+            f"fps=1/{thumb_every},scale=320:-2",
+            "-q:v",
+            "4",
+            str(thumbs_dir / "t%05d.jpg"),
+        ]
+    )
     thumbnails = sorted(thumbs_dir.glob("t*.jpg"))
 
     time_map = TimeMap(

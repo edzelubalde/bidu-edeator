@@ -38,7 +38,9 @@ def verify_output(path: Path, timeline: Timeline, profile: RenderProfile) -> Out
         if abs(frames - timeline.duration_frames) > 1:
             errors.append(f"Expected {timeline.duration_frames} frames, decoded {frames}")
         if (int(video["width"]), int(video["height"])) != (profile.width, profile.height):
-            errors.append(f"Expected {profile.width}x{profile.height}, got {video['width']}x{video['height']}")
+            errors.append(
+                f"Expected {profile.width}x{profile.height}, got {video['width']}x{video['height']}"
+            )
         if video.get("codec_name") != "h264":
             errors.append(f"Expected H.264, got {video.get('codec_name')}")
     if audio is None:
@@ -46,16 +48,27 @@ def verify_output(path: Path, timeline: Timeline, profile: RenderProfile) -> Out
     duration = float(Fraction(data.get("format", {}).get("duration", "0")))
 
     review = _scan_black_and_silence(path)
-    return OutputCheck(ok=not errors, errors=errors, review=review, frames=frames,
-                       duration_seconds=duration)
+    return OutputCheck(ok=not errors, errors=errors, review=review, frames=frames, duration_seconds=duration)
 
 
 def _scan_black_and_silence(path: Path) -> list[str]:
     proc = subprocess.run(
-        [FFMPEG, "-hide_banner", "-nostdin", "-i", str(path),
-         "-vf", "blackdetect=d=1.0:pix_th=0.10", "-af", "silencedetect=n=-50dB:d=2.0",
-         "-f", "null", "-"],
-        capture_output=True, text=True,
+        [
+            FFMPEG,
+            "-hide_banner",
+            "-nostdin",
+            "-i",
+            str(path),
+            "-vf",
+            "blackdetect=d=1.0:pix_th=0.10",
+            "-af",
+            "silencedetect=n=-50dB:d=2.0",
+            "-f",
+            "null",
+            "-",
+        ],
+        capture_output=True,
+        text=True,
     )
     notes = []
     for m in re.finditer(r"black_start:([\d.]+) black_end:([\d.]+)", proc.stderr):

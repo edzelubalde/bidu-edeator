@@ -1,0 +1,266 @@
+{
+  "$defs": {
+    "ExcludeMoment": {
+      "properties": {
+        "moment_id": {
+          "title": "Moment Id",
+          "type": "string"
+        },
+        "op": {
+          "const": "exclude_moment",
+          "default": "exclude_moment",
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "moment_id"
+      ],
+      "title": "ExcludeMoment",
+      "type": "object"
+    },
+    "MoveCard": {
+      "properties": {
+        "beat_id": {
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "op": {
+          "const": "move_card",
+          "default": "move_card",
+          "title": "Op",
+          "type": "string"
+        },
+        "to_index": {
+          "minimum": 0,
+          "title": "To Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "beat_id",
+        "to_index"
+      ],
+      "title": "MoveCard",
+      "type": "object"
+    },
+    "RationalTime": {
+      "description": "``value`` frames at ``rate_num/rate_den`` frames per second.",
+      "properties": {
+        "rate_den": {
+          "default": 1,
+          "exclusiveMinimum": 0,
+          "title": "Rate Den",
+          "type": "integer"
+        },
+        "rate_num": {
+          "exclusiveMinimum": 0,
+          "title": "Rate Num",
+          "type": "integer"
+        },
+        "value": {
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value",
+        "rate_num"
+      ],
+      "title": "RationalTime",
+      "type": "object"
+    },
+    "RemoveCard": {
+      "properties": {
+        "beat_id": {
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "op": {
+          "const": "remove_card",
+          "default": "remove_card",
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "beat_id"
+      ],
+      "title": "RemoveCard",
+      "type": "object"
+    },
+    "RemoveClip": {
+      "properties": {
+        "clip_id": {
+          "title": "Clip Id",
+          "type": "string"
+        },
+        "op": {
+          "const": "remove_clip",
+          "default": "remove_clip",
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "clip_id"
+      ],
+      "title": "RemoveClip",
+      "type": "object"
+    },
+    "SetLock": {
+      "properties": {
+        "clip_id": {
+          "title": "Clip Id",
+          "type": "string"
+        },
+        "op": {
+          "const": "set_lock",
+          "default": "set_lock",
+          "title": "Op",
+          "type": "string"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Position"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source"
+        }
+      },
+      "required": [
+        "clip_id"
+      ],
+      "title": "SetLock",
+      "type": "object"
+    },
+    "SwapMoment": {
+      "properties": {
+        "asset_id": {
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "clip_id": {
+          "title": "Clip Id",
+          "type": "string"
+        },
+        "moment_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Moment Id"
+        },
+        "op": {
+          "const": "swap_moment",
+          "default": "swap_moment",
+          "title": "Op",
+          "type": "string"
+        },
+        "source_duration": {
+          "$ref": "#/$defs/RationalTime"
+        },
+        "source_in": {
+          "$ref": "#/$defs/RationalTime"
+        }
+      },
+      "required": [
+        "clip_id",
+        "asset_id",
+        "moment_id",
+        "source_in",
+        "source_duration"
+      ],
+      "title": "SwapMoment",
+      "type": "object"
+    },
+    "TrimClip": {
+      "properties": {
+        "clip_id": {
+          "title": "Clip Id",
+          "type": "string"
+        },
+        "op": {
+          "const": "trim_clip",
+          "default": "trim_clip",
+          "title": "Op",
+          "type": "string"
+        },
+        "source_duration": {
+          "$ref": "#/$defs/RationalTime"
+        },
+        "source_in": {
+          "$ref": "#/$defs/RationalTime"
+        }
+      },
+      "required": [
+        "clip_id",
+        "source_in",
+        "source_duration"
+      ],
+      "title": "TrimClip",
+      "type": "object"
+    }
+  },
+  "$id": "https://bidu.dev/schemas/edit-ops.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "discriminator": {
+      "mapping": {
+        "exclude_moment": "#/$defs/ExcludeMoment",
+        "move_card": "#/$defs/MoveCard",
+        "remove_card": "#/$defs/RemoveCard",
+        "remove_clip": "#/$defs/RemoveClip",
+        "set_lock": "#/$defs/SetLock",
+        "swap_moment": "#/$defs/SwapMoment",
+        "trim_clip": "#/$defs/TrimClip"
+      },
+      "propertyName": "op"
+    },
+    "oneOf": [
+      {
+        "$ref": "#/$defs/MoveCard"
+      },
+      {
+        "$ref": "#/$defs/TrimClip"
+      },
+      {
+        "$ref": "#/$defs/SwapMoment"
+      },
+      {
+        "$ref": "#/$defs/SetLock"
+      },
+      {
+        "$ref": "#/$defs/RemoveCard"
+      },
+      {
+        "$ref": "#/$defs/RemoveClip"
+      },
+      {
+        "$ref": "#/$defs/ExcludeMoment"
+      }
+    ]
+  },
+  "type": "array"
+}

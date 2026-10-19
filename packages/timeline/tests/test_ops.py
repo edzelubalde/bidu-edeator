@@ -31,11 +31,17 @@ def test_move_card_keeps_clip_order_within_beat(three_beats):
 
 def test_trim_shortens_linked_audio_and_clips_overlay(three_beats, sources):
     # c2 was 3 s; trim it to 1.5 s starting 0.5 s later.
-    t = apply_ops(three_beats, ops({
-        "op": "trim_clip", "clip_id": "c2",
-        "source_in": {"value": 165, "rate_num": 30},
-        "source_duration": {"value": 45, "rate_num": 30},
-    })).timeline
+    t = apply_ops(
+        three_beats,
+        ops(
+            {
+                "op": "trim_clip",
+                "clip_id": "c2",
+                "source_in": {"value": 165, "rate_num": 30},
+                "source_duration": {"value": 45, "rate_num": 30},
+            }
+        ),
+    ).timeline
     c2 = next(c for c in t.video("V1") if c.id == "c2")
     a2 = next(c for c in t.audio("A1") if c.id == "c2_a")
     assert (c2.duration_frames, a2.duration_frames) == (45, 45)
@@ -49,10 +55,19 @@ def test_trim_shortens_linked_audio_and_clips_overlay(three_beats, sources):
 
 
 def test_swap_replaces_source_and_audio(three_beats, sources):
-    t = apply_ops(three_beats, ops({
-        "op": "swap_moment", "clip_id": "c1", "asset_id": "asset_b", "moment_id": "m9",
-        "source_in": {"value": 0, "rate_num": 30}, "source_duration": {"value": 90, "rate_num": 30},
-    })).timeline
+    t = apply_ops(
+        three_beats,
+        ops(
+            {
+                "op": "swap_moment",
+                "clip_id": "c1",
+                "asset_id": "asset_b",
+                "moment_id": "m9",
+                "source_in": {"value": 0, "rate_num": 30},
+                "source_duration": {"value": 90, "rate_num": 30},
+            }
+        ),
+    ).timeline
     c1 = t.video("V1")[0]
     assert (c1.asset_id, c1.moment_id, c1.duration_frames) == ("asset_b", "m9", 90)
     assert t.audio("A1")[0].asset_id == "asset_b"
@@ -63,9 +78,17 @@ def test_locked_clip_cannot_be_trimmed_or_excluded(three_beats):
     locked = apply_ops(three_beats, ops({"op": "set_lock", "clip_id": "c3", "source": True})).timeline
     assert next(c for c in locked.video("V1") if c.id == "c3").locks.source
     with pytest.raises(OpError) as e:
-        apply_ops(locked, ops({"op": "trim_clip", "clip_id": "c3",
-                               "source_in": {"value": 0, "rate_num": 30},
-                               "source_duration": {"value": 30, "rate_num": 30}}))
+        apply_ops(
+            locked,
+            ops(
+                {
+                    "op": "trim_clip",
+                    "clip_id": "c3",
+                    "source_in": {"value": 0, "rate_num": 30},
+                    "source_duration": {"value": 30, "rate_num": 30},
+                }
+            ),
+        )
     assert e.value.code == "CLIP_LOCKED"
     with pytest.raises(OpError):
         apply_ops(locked, ops({"op": "exclude_moment", "moment_id": "m3"}))
@@ -80,8 +103,10 @@ def test_remove_card_drops_anchored_items(three_beats, sources):
 
 
 def test_exclude_moment_reports_exclusion(three_beats, sources):
-    result = apply_ops(three_beats, ops({"op": "exclude_moment", "moment_id": "m5"},
-                                        {"op": "exclude_moment", "moment_id": "m4"}))
+    result = apply_ops(
+        three_beats,
+        ops({"op": "exclude_moment", "moment_id": "m5"}, {"op": "exclude_moment", "moment_id": "m4"}),
+    )
     assert result.excluded_moment_ids == ["m5", "m4"]
     assert result.timeline.video("V2") == []
     assert [c.id for c in result.timeline.video("V1")] == ["c1", "c2", "c3"]
@@ -95,17 +120,25 @@ def test_ops_do_not_mutate_input(three_beats):
 
 
 def test_unknown_targets_raise(three_beats):
-    for raw in ({"op": "move_card", "beat_id": "nope", "to_index": 0},
-                {"op": "remove_clip", "clip_id": "nope"}):
+    for raw in (
+        {"op": "move_card", "beat_id": "nope", "to_index": 0},
+        {"op": "remove_clip", "clip_id": "nope"},
+    ):
         with pytest.raises(OpError):
             apply_ops(three_beats, ops(raw))
 
 
 def test_rational_time_in_ops_accepts_other_rates(three_beats, sources):
-    t = apply_ops(three_beats, ops({
-        "op": "trim_clip", "clip_id": "c4",
-        "source_in": RationalTime(value=20 * 25, rate_num=25).model_dump(),
-        "source_duration": RationalTime(value=25, rate_num=25).model_dump(),
-    })).timeline
+    t = apply_ops(
+        three_beats,
+        ops(
+            {
+                "op": "trim_clip",
+                "clip_id": "c4",
+                "source_in": RationalTime(value=20 * 25, rate_num=25).model_dump(),
+                "source_duration": RationalTime(value=25, rate_num=25).model_dump(),
+            }
+        ),
+    ).timeline
     assert t.video("V1")[-1].duration_frames == 30
     assert validate_timeline(t, sources).ok

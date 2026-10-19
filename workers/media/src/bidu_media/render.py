@@ -41,8 +41,9 @@ class RenderProfile(BaseModel):
     true_peak_db: float = -1.0
 
 
-PREVIEW = RenderProfile(name="preview", width=1280, height=720, crf=26, preset="veryfast",
-                        audio_bitrate="128k")
+PREVIEW = RenderProfile(
+    name="preview", width=1280, height=720, crf=26, preset="veryfast", audio_bitrate="128k"
+)
 DELIVERY = RenderProfile(name="delivery", width=1920, height=1080, crf=19, preset="medium")
 PROFILES = {p.name: p for p in (PREVIEW, DELIVERY)}
 
@@ -85,8 +86,14 @@ def _input(src: RenderSource, start: Fraction, duration: Fraction) -> list[str]:
     # Canonical time -> ffmpeg seek time; pad duration by a frame so the
     # decoder never runs dry before -frames:v is reached.
     seek = start + src.probe.seek_offset_seconds
-    return ["-ss", _secs(max(seek, Fraction(0))), "-t", _secs(duration + Fraction(1, 10)),
-            "-i", str(src.path)]
+    return [
+        "-ss",
+        _secs(max(seek, Fraction(0))),
+        "-t",
+        _secs(duration + Fraction(1, 10)),
+        "-i",
+        str(src.path),
+    ]
 
 
 def plan_segments(
@@ -96,9 +103,25 @@ def plan_segments(
     fps = f"{rate.numerator}/{rate.denominator}"
     v1 = sorted(timeline.video("V1"), key=lambda c: c.timeline_start_frame)
     v2 = timeline.video("V2")
-    encode = ["-c:v", "libx264", "-preset", profile.preset, "-crf", str(profile.crf),
-              "-pix_fmt", "yuv420p", "-color_primaries", "bt709", "-color_trc", "bt709",
-              "-colorspace", "bt709", "-g", str(rate.numerator * 2), "-an"]
+    encode = [
+        "-c:v",
+        "libx264",
+        "-preset",
+        profile.preset,
+        "-crf",
+        str(profile.crf),
+        "-pix_fmt",
+        "yuv420p",
+        "-color_primaries",
+        "bt709",
+        "-color_trc",
+        "bt709",
+        "-colorspace",
+        "bt709",
+        "-g",
+        str(rate.numerator * 2),
+        "-an",
+    ]
 
     spans: list[tuple[int, int, VideoClip | None]] = []
     cursor = 0
@@ -115,8 +138,7 @@ def plan_segments(
         seg_dur = rate.frames_to_seconds(frames)
         inputs: list[str] = []
         graph: list[str] = []
-        identity: dict = {"v": RENDER_VERSION, "profile": profile.model_dump(), "frames": frames,
-                          "rate": fps}
+        identity: dict = {"v": RENDER_VERSION, "profile": profile.model_dump(), "frames": frames, "rate": fps}
         w, h = profile.width, profile.height
         if base is None:
             inputs += ["-f", "lavfi", "-i", f"color=c={PAD_COLOR}:s={w}x{h}:r={fps}"]
@@ -132,8 +154,7 @@ def plan_segments(
             identity["base"] = _clip_identity(base, src)
 
         last = "base"
-        overlays = [o for o in v2 if o.timeline_start_frame < start + frames
-                    and o.timeline_end_frame > start]
+        overlays = [o for o in v2 if o.timeline_start_frame < start + frames and o.timeline_end_frame > start]
         for n, o in enumerate(sorted(overlays, key=lambda c: c.timeline_start_frame), start=1):
             src = sources[o.asset_id]
             lead_frames = max(0, start - o.timeline_start_frame)
@@ -148,17 +169,29 @@ def plan_segments(
                 f"[{n}:v]{sdr_filter(src.probe)},{fit_filter(w, h, o.fit, PAD_COLOR)},fps={fps},"
                 f"setpts=PTS-STARTPTS+{delay}/TB{alpha}[o{n}]"
             )
-            graph.append(
-                f"[{last}][o{n}]overlay=eof_action=pass:enable='between(t,{delay},{end})'[m{n}]"
-            )
+            graph.append(f"[{last}][o{n}]overlay=eof_action=pass:enable='between(t,{delay},{end})'[m{n}]")
             last = f"m{n}"
             identity.setdefault("overlays", []).append(
-                {"clip": _clip_identity(o, src), "lead": lead_frames, "delay": delay_frames,
-                 "visible": visible}
+                {
+                    "clip": _clip_identity(o, src),
+                    "lead": lead_frames,
+                    "delay": delay_frames,
+                    "visible": visible,
+                }
             )
         graph.append(f"[{last}]format=yuv420p[vout]")
-        args = (*inputs, "-filter_complex", ";".join(graph), "-map", "[vout]",
-                "-frames:v", str(frames), "-r", fps, *encode)
+        args = (
+            *inputs,
+            "-filter_complex",
+            ";".join(graph),
+            "-map",
+            "[vout]",
+            "-frames:v",
+            str(frames),
+            "-r",
+            fps,
+            *encode,
+        )
         key = hashlib.sha256(json.dumps(identity, sort_keys=True, default=str).encode()).hexdigest()
         segments.append(Segment(index=index, start_frame=start, frames=frames, args=args, key=key))
     return segments
@@ -176,8 +209,12 @@ def _clip_identity(clip: VideoClip, src: RenderSource) -> dict:
 
 
 def audio_args(
-    timeline: Timeline, sources: dict[str, RenderSource], profile: RenderProfile, out: Path,
-    *, music: dict[str, Path] | None = None,
+    timeline: Timeline,
+    sources: dict[str, RenderSource],
+    profile: RenderProfile,
+    out: Path,
+    *,
+    music: dict[str, Path] | None = None,
 ) -> list[str]:
     """One mixing pass: place every A1/A2 clip, duck music under dialogue, normalize loudness."""
     rate = timeline.timebase
@@ -200,8 +237,13 @@ def audio_args(
         else:
             raise KeyError(f"No source for audio clip {clip.id}")
         delay_ms = int(rate.frames_to_seconds(clip.timeline_start_frame) * 1000)
-        chain = [f"[{n}:a]aresample=48000", "aformat=sample_fmts=fltp:channel_layouts=stereo",
-                 f"atrim=0:{_secs(dur)}", "asetpts=PTS-STARTPTS", f"volume={clip.gain_db}dB"]
+        chain = [
+            f"[{n}:a]aresample=48000",
+            "aformat=sample_fmts=fltp:channel_layouts=stereo",
+            f"atrim=0:{_secs(dur)}",
+            "asetpts=PTS-STARTPTS",
+            f"volume={clip.gain_db}dB",
+        ]
         if clip.fade_in_frames:
             chain.append(f"afade=t=in:d={_secs(rate.frames_to_seconds(clip.fade_in_frames))}")
         if clip.fade_out_frames:
@@ -245,8 +287,7 @@ def audio_args(
     )
     if used_silence:
         inputs += ["-f", "lavfi", "-t", _secs(total), "-i", "anullsrc=r=48000:cl=stereo"]
-    return [*inputs, "-filter_complex", ";".join(graph), "-map", "[aout]",
-            "-c:a", "pcm_s16le", str(out)]
+    return [*inputs, "-filter_complex", ";".join(graph), "-map", "[aout]", "-c:a", "pcm_s16le", str(out)]
 
 
 def render(
@@ -293,9 +334,30 @@ def render(
 
     tmp_out = out.with_name(f".tmp-{out.name}")
     run_ffmpeg(
-        ["-f", "concat", "-safe", "0", "-i", str(listing), "-i", str(audio),
-         "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy", "-c:a", "aac", "-b:a", profile.audio_bitrate,
-         "-shortest", "-movflags", "+faststart", str(tmp_out)],
+        [
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            str(listing),
+            "-i",
+            str(audio),
+            "-map",
+            "0:v:0",
+            "-map",
+            "1:a:0",
+            "-c:v",
+            "copy",
+            "-c:a",
+            "aac",
+            "-b:a",
+            profile.audio_bitrate,
+            "-shortest",
+            "-movflags",
+            "+faststart",
+            str(tmp_out),
+        ],
         code="RENDER_FAILED",
     )
     tmp_out.replace(out)

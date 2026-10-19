@@ -15,7 +15,13 @@ from .model import (
 )
 from .ops import EditOp, OpError, OpsResult, apply_ops
 from .rational import Rate, RationalTime
-from .validate import InvalidTimeline, SourceInfo, ValidationReport, require_valid, validate_timeline
+from .validate import (
+    InvalidTimeline,
+    SourceInfo,
+    ValidationReport,
+    require_valid,
+    validate_timeline,
+)
 
 __all__ = [
     "SCHEMA_VERSION",

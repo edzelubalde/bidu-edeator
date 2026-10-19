@@ -1,0 +1,100 @@
+{
+  "$defs": {
+    "Beat": {
+      "properties": {
+        "budget_ms": {
+          "exclusiveMinimum": 0,
+          "title": "Budget Ms",
+          "type": "integer"
+        },
+        "candidate_moment_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Candidate Moment Ids",
+          "type": "array"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "purpose": {
+          "title": "Purpose",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "purpose",
+        "budget_ms",
+        "candidate_moment_ids"
+      ],
+      "title": "Beat",
+      "type": "object"
+    }
+  },
+  "$id": "https://bidu.dev/schemas/proposal.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "audience": {
+      "title": "Audience",
+      "type": "string"
+    },
+    "beats": {
+      "items": {
+        "$ref": "#/$defs/Beat"
+      },
+      "title": "Beats",
+      "type": "array"
+    },
+    "gaps": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Gaps",
+      "type": "array"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "chronological",
+        "experience",
+        "informative"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "planner_id": {
+      "title": "Planner Id",
+      "type": "string"
+    },
+    "premise": {
+      "title": "Premise",
+      "type": "string"
+    },
+    "target_ms": {
+      "title": "Target Ms",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "premise",
+    "audience",
+    "target_ms",
+    "beats",
+    "planner_id"
+  ],
+  "title": "Proposal",
+  "type": "object"
+}

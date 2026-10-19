@@ -38,8 +38,13 @@ def test_overlap_and_gap(three_beats, sources):
     v1[1] = v1[1].model_copy(update={"timeline_start_frame": 50})
     assert "TRACK_OVERLAP" in validate_timeline(_replace(three_beats, v1=v1), sources).codes()
     v1 = three_beats.video("V1")
-    v1[0] = v1[0].model_copy(update={"timeline_start_frame": 0, "duration_frames": 50,
-                                     "source_duration": RationalTime(value=50, rate_num=30)})
+    v1[0] = v1[0].model_copy(
+        update={
+            "timeline_start_frame": 0,
+            "duration_frames": 50,
+            "source_duration": RationalTime(value=50, rate_num=30),
+        }
+    )
     report = validate_timeline(_replace(three_beats, v1=v1), sources)
     assert report.ok and "GAP" in report.codes()
 
@@ -47,22 +52,33 @@ def test_overlap_and_gap(three_beats, sources):
 def test_linked_audio_out_of_sync(three_beats, sources):
     a1 = three_beats.audio("A1")
     a1[0] = a1[0].model_copy(update={"timeline_start_frame": 5})
-    a1[0] = a1[0].model_copy(update={"duration_frames": 55,
-                                     "source_duration": RationalTime(value=55, rate_num=30)})
+    a1[0] = a1[0].model_copy(
+        update={"duration_frames": 55, "source_duration": RationalTime(value=55, rate_num=30)}
+    )
     assert "LINK_OUT_OF_SYNC" in validate_timeline(_replace(three_beats, a1=a1), sources).codes()
 
 
 def test_audio_from_silent_asset(three_beats, sources):
-    a1 = [*three_beats.audio("A1"), AudioClip(
-        id="amb", asset_id="asset_c", beat_id="food", timeline_start_frame=0, duration_frames=30,
-        source_in=RationalTime(value=0, rate_num=30), source_duration=RationalTime(value=30, rate_num=30),
-        role="ambience")]
+    a1 = [
+        *three_beats.audio("A1"),
+        AudioClip(
+            id="amb",
+            asset_id="asset_c",
+            beat_id="food",
+            timeline_start_frame=0,
+            duration_frames=30,
+            source_in=RationalTime(value=0, rate_num=30),
+            source_duration=RationalTime(value=30, rate_num=30),
+            role="ambience",
+        ),
+    ]
     codes = validate_timeline(_replace(three_beats, a1=a1), sources).codes()
     assert "SOURCE_HAS_NO_AUDIO" in codes and "TRACK_OVERLAP" in codes
 
 
 def test_timeline_json_round_trip(three_beats):
     from bidu_timeline import Timeline
+
     again = Timeline.model_validate_json(three_beats.model_dump_json())
     assert again == three_beats
     assert three_beats.video("V1")[0].source_in.seconds == Fraction(10)
