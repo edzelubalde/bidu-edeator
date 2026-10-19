@@ -1,0 +1,227 @@
+{
+  "$defs": {
+    "Evidence": {
+      "properties": {
+        "end_ms": {
+          "title": "End Ms",
+          "type": "integer"
+        },
+        "start_ms": {
+          "title": "Start Ms",
+          "type": "integer"
+        },
+        "type": {
+          "enum": [
+            "video",
+            "audio",
+            "transcript"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "start_ms",
+        "end_ms"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Inference": {
+      "properties": {
+        "certainty": {
+          "enum": [
+            "likely",
+            "uncertain"
+          ],
+          "title": "Certainty",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "certainty"
+      ],
+      "title": "Inference",
+      "type": "object"
+    },
+    "Quality": {
+      "properties": {
+        "exposure": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Exposure",
+          "type": "number"
+        },
+        "sharpness": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Sharpness",
+          "type": "number"
+        },
+        "speech": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Speech"
+        }
+      },
+      "required": [
+        "sharpness",
+        "exposure"
+      ],
+      "title": "Quality",
+      "type": "object"
+    },
+    "RangeMs": {
+      "properties": {
+        "in": {
+          "minimum": 0,
+          "title": "In",
+          "type": "integer"
+        },
+        "out": {
+          "exclusiveMinimum": 0,
+          "title": "Out",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "in",
+        "out"
+      ],
+      "title": "RangeMs",
+      "type": "object"
+    }
+  },
+  "$id": "https://bidu.dev/schemas/moment.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "One evidence-linked span of footage. Observations are things seen or heard;\ninferences are interpretations and carry their certainty.",
+  "properties": {
+    "analysis_run_id": {
+      "title": "Analysis Run Id",
+      "type": "string"
+    },
+    "asset_id": {
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/Evidence"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "has_speech": {
+      "default": false,
+      "title": "Has Speech",
+      "type": "boolean"
+    },
+    "inferences": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Inference"
+      },
+      "title": "Inferences",
+      "type": "array"
+    },
+    "labels": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Labels",
+      "type": "array"
+    },
+    "location": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Location"
+    },
+    "moment_id": {
+      "title": "Moment Id",
+      "type": "string"
+    },
+    "observations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Observations",
+      "type": "array"
+    },
+    "quality": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Quality"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "relevance": {
+      "default": 0.5,
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Relevance",
+      "type": "number"
+    },
+    "shot_role": {
+      "default": "other",
+      "enum": [
+        "establishing",
+        "action",
+        "detail",
+        "reaction",
+        "dialogue",
+        "transition",
+        "other"
+      ],
+      "title": "Shot Role",
+      "type": "string"
+    },
+    "source_range_ms": {
+      "$ref": "#/$defs/RangeMs"
+    },
+    "transcript_segment_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Transcript Segment Ids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "moment_id",
+    "asset_id",
+    "analysis_run_id",
+    "source_range_ms",
+    "observations",
+    "evidence"
+  ],
+  "title": "Moment",
+  "type": "object"
+}
