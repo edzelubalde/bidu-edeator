@@ -1,0 +1,36 @@
+[project]
+name = "bidu-edeator"
+version = "0.1.0"
+description = "AI-assisted rough-cut editor for vlogs"
+requires-python = ">=3.12"
+dependencies = [
+    "bidu-timeline",
+    "bidu-media",
+    "bidu-analysis",
+    "bidu-workflows",
+]
+
+[tool.uv.workspace]
+members = ["packages/timeline", "workers/media", "workers/analysis", "workflows"]
+
+[tool.uv.sources]
+bidu-timeline = { workspace = true }
+bidu-media = { workspace = true }
+bidu-analysis = { workspace = true }
+bidu-workflows = { workspace = true }
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.6"]
+
+[tool.pytest.ini_options]
+testpaths = ["packages/timeline/tests", "workers/media/tests", "workers/analysis/tests", "workflows/tests", "scripts"]
+asyncio_mode = "auto"
+addopts = "--import-mode=importlib"
+markers = ["ffmpeg: needs ffmpeg/ffprobe on PATH", "temporal: starts a local Temporal test server"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
