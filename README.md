@@ -3,10 +3,23 @@
 AI-assisted rough-cut editor for vlogs: a folder of raw clips goes in, an evidence-linked story and a
 playable rough cut come out, and the creator stays in control of every shot.
 
-This repository follows the build spec (v1.0, 19 Oct 2026). It currently holds the **timeline core and
-the first end-to-end slice**, run from the command line. The API and web app come next.
+This repository follows the build spec (v1.0, 19 Oct 2026).
 
-## Run it
+## Open the editor
+
+Needs [uv](https://docs.astral.sh/uv/), [Node.js](https://nodejs.org/) 20+ and ffmpeg.
+
+```sh
+scripts/start.sh
+```
+
+Then open http://localhost:8000 in your browser. Start a vlog, drop in your clips, pick a length and
+press **Make my rough cut**. Rearrange or trim the shots, then **Make HD video** and download the MP4.
+Your projects are kept in `data/` (set `BIDU_DATA` to put them elsewhere).
+
+Until a Gemini key is set (see Models below), the "AI" picks shots by picture quality and timing only.
+
+## Command line
 
 Needs Python 3.12+, [uv](https://docs.astral.sh/uv/) and ffmpeg/ffprobe on `PATH`.
 

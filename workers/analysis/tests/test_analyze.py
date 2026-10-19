@@ -95,7 +95,8 @@ def test_offline_model_covers_silent_footage_without_inventing(derived):
     assert covered >= int(derived.time_map.source_duration_seconds * 1000) - 100
     for m in out.moments:
         assert m.location is None
-        assert all("no visual description" in o or o.startswith("Someone says") for o in m.observations)
+        quiet = "Quiet shot, picked for picture quality"
+        assert all(o == quiet or o.startswith("Someone says") for o in m.observations)
 
 
 def test_run_id_changes_when_model_or_prompt_inputs_change(derived):

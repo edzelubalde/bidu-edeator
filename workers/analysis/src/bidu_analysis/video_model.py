@@ -66,7 +66,7 @@ class OfflineVideoModel:
     transcript, and observations say only that.
     """
 
-    model_id = "offline-heuristic-1"
+    model_id = "offline-heuristic-2"
 
     def analyze_window(self, proxy, window_ms, transcript, cuts_ms):
         start, _ = window_ms
@@ -84,7 +84,7 @@ class OfflineVideoModel:
                     obs = [f'Someone says: "{t.text}"' for t in said]
                     role, relevance = "dialogue", 0.7
                 else:
-                    obs = ["Footage with no detected speech (no visual description available offline)"]
+                    obs = ["Quiet shot, picked for picture quality"]
                     role, relevance = ("establishing" if i == 0 and s == a else "other"), 0.4
                 moments.append(
                     RawMoment(
